@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>燃气出入库系统</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        .header {
+            background-color: #409EFF;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-left {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            flex: 1;
+        }
+        .nav-right {
+            display: flex;
+            gap: 10px;
+        }
+        .nav button {
+            padding: 12px 18px;
+            background-color: #409EFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav button:hover {
+            background-color: #66B1FF;
+            transform: translateY(-1px);
+        }
+        .nav button.active {
+            background-color: #66B1FF;
+            box-shadow: 0 2px 4px rgba(64, 158, 255, 0.3);
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        }
+        .content h2 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #303133;
+        }
+        .form-item {
+            margin-bottom: 20px;
+        }
+        .form-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #606266;
+        }
+        .form-item input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #DCDFE6;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        .form-item input:focus {
+            outline: none;
+            border-color: #409EFF;
+            box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+        }
+        .btn-submit {
+            padding: 12px 24px;
+            background-color: #67C23A;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-submit:hover {
+            background-color: #85ce61;
+            transform: translateY(-1px);
+        }
+        .btn-cancel {
+            padding: 12px 24px;
+            background-color: #909399;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-cancel:hover {
+            background-color: #a6a9ad;
+        }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .summary-item {
+            background-color: #ECF5FF;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .summary-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .summary-item h3 {
+            color: #409EFF;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .summary-item .value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #303133;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #EBEEF5;
+        }
+        th {
+            background-color: #F5F7FA;
+            font-weight: bold;
+            color: #606266;
+        }
+        tr:hover {
+            background-color: #ECF5FF;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 80px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #303133;
+            font-size: 22px;
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .login-footer button {
+            background: none;
+            border: none;
+            color: #409EFF;
+            cursor: pointer;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .login-footer button:hover {
+            color: #66B1FF;
+            text-decoration: underline;
+        }
+        .settings-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .header {
+                padding: 15px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .nav {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .nav-left {
+                justify-content: center;
+            }
+            .nav-right {
+                justify-content: center;
+            }
+            .nav button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+            .content {
+                padding: 15px;
+            }
+            .content h2 {
+                font-size: 18px;
+            }
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .summary-item {
+                padding: 15px;
+            }
+            .summary-item .value {
+                font-size: 18px;
+            }
+            table {
+                font-size: 13px;
+            }
+            th, td {
+                padding: 10px;
+            }
+            .login-container {
+                margin: 50px auto;
+                padding: 25px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+            .nav-left {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .nav-right {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .nav button {
+                width: 100%;
+                text-align: center;
+            }
+            .form-item input {
+                padding: 10px;
+                font-size: 14px;
+            }
+            .btn-submit, .btn-cancel {
+                padding: 10px 20px;
+                font-size: 14px;
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 登录页面 -->
+        <div v-if="!isLoggedIn" class="login-container">
+            <h2>燃气出入库系统</h2>
+            <form @submit.prevent="handleLogin">
+                <div class="form-item">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" v-model="loginForm.username" placeholder="请输入用户名" required>
+                </div>
+                <div class="form-item">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" v-model="loginForm.password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="btn-submit" style="width: 100%;">登录</button>
+                <div class="login-footer">
+                    <button type="button" @click="showServerSettings = true" style="margin-right: 20px;">服务器设置</button>
+                    <span style="font-size: 12px; color: #909399;">默认账号: admin / 123456</span>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 主应用页面 -->
+        <div v-else class="container">
+            <div class="header">
+                <h1>燃气出入库系统</h1>
+            </div>
+            <div class="nav">
+                <div class="nav-left">
+                    <button :class="{ active: activeTab === 'in' }" @click="activeTab = 'in'">燃气入库</button>
+                    <button :class="{ active: activeTab === 'out' }" @click="activeTab = 'out'">燃气出库</button>
+                    <button :class="{ active: activeTab === 'report' }" @click="activeTab = 'report'">报表</button>
+                </div>
+                <div class="nav-right">
+                    <button @click="showServerSettings = true">服务器设置</button>
+                    <button @click="handleLogout">退出登录</button>
+                </div>
+            </div>
+            <div class="content">
+                <!-- 入库表单 -->
+                <div v-if="activeTab === 'in'">
+                    <h2>燃气入库</h2>
+                    <form @submit.prevent="handleInSubmit">
+                        <div class="form-item">
+                            <label for="in-weight">燃气重量（公斤）</label>
+                            <input type="number" id="in-weight" v-model.number="inForm.weight" placeholder="请输入燃气重量" required>
+                        </div>
+                        <div class="form-item">
+                            <label for="in-amount">金额</label>
+                            <input type="number" id="in-amount" v-model.number="inForm.amount" placeholder="请输入金额" required>
+                        </div>
+                        <button type="submit" class="btn-submit">提交入库</button>
+                    </form>
+                </div>
+                
+                <!-- 出库表单 -->
+                <div v-if="activeTab === 'out'">
+                    <h2>燃气出库</h2>
+                    <form @submit.prevent="handleOutSubmit">
+                        <div class="form-item">
+                            <label for="out-weight">燃气重量（斤）</label>
+                            <input type="number" id="out-weight" v-model.number="outForm.weight" placeholder="请输入燃气重量" required>
+                        </div>
+                        <div class="form-item">
+                            <label for="out-amount">金额</label>
+                            <input type="number" id="out-amount" v-model.number="outForm.amount" placeholder="请输入金额" required>
+                        </div>
+                        <button type="submit" class="btn-submit">提交出库</button>
+                    </form>
+                </div>
+                
+                <!-- 报表 -->
+                <div v-if="activeTab === 'report'">
+                    <h2>报表</h2>
+                    
+                    <!-- 时间范围选择 -->
+                    <div style="margin-bottom: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
+                        <h3 style="margin-bottom: 15px; font-size: 16px;">时间范围查询</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+                            <div class="form-item" style="flex: 1; min-width: 200px;">
+                                <label for="startDate">开始日期</label>
+                                <input type="date" id="startDate" v-model="dateRange.start" style="width: 100%;">
+                            </div>
+                            <div class="form-item" style="flex: 1; min-width: 200px;">
+                                <label for="endDate">结束日期</label>
+                                <input type="date" id="endDate" v-model="dateRange.end" style="width: 100%;">
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                                <button class="btn-submit" @click="fetchRecordsByDateRange">查询</button>
+                                <button class="btn-cancel" @click="resetDateRange">重置</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary">
+                        <div class="summary-item">
+                            <h3>燃气库存结余</h3>
+                            <div class="value">{{ summary.current_stock }} 公斤</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>总销售额</h3>
+                            <div class="value">¥{{ summary.total_sales }}</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>总成本</h3>
+                            <div class="value">¥{{ summary.total_cost }}</div>
+                        </div>
+                        <div class="summary-item">
+                            <h3>盈利</h3>
+                            <div class="value">¥{{ summary.profit }}</div>
+                        </div>
+                    </div>
+                    <h3>出入库记录</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>类型</th>
+                                <th>重量</th>
+                                <th>单位</th>
+                                <th>金额</th>
+                                <th>时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="record in records" :key="record.id">
+                                <td>{{ record.id }}</td>
+                                <td>{{ record.type }}</td>
+                                <td>{{ record.weight }}</td>
+                                <td>{{ record.unit }}</td>
+                                <td>¥{{ record.amount }}</td>
+                                <td>{{ record.created_at }}</td>
+                                <td>
+                                    <button style="padding: 5px 10px; margin-right: 5px; background-color: #409EFF; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;" @click="editRecord(record)">编辑</button>
+                                    <button style="padding: 5px 10px; background-color: #F56C6C; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;" @click="confirmDelete(record.id)">删除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- 编辑记录弹窗 -->
+                    <div v-if="showEditModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                        <div style="background-color: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px;">
+                            <h3>编辑记录</h3>
+                            <form @submit.prevent="saveEdit">
+                                <div class="form-item">
+                                    <label>类型</label>
+                                    <input type="text" v-model="editForm.type" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
+                                </div>
+                                <div class="form-item">
+                                    <label>重量 ({{ editForm.unit }})</label>
+                                    <input type="number" v-model.number="editForm.weight" placeholder="请输入重量" required>
+                                </div>
+                                <div class="form-item">
+                                    <label>金额</label>
+                                    <input type="number" v-model.number="editForm.amount" placeholder="请输入金额" required>
+                                </div>
+                                <div class="form-item">
+                                    <label>单位</label>
+                                    <input type="text" v-model="editForm.unit" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
+                                </div>
+                                <div style="text-align: right; margin-top: 20px;">
+                                    <button type="button" class="btn-cancel" @click="showEditModal = false">取消</button>
+                                    <button type="submit" class="btn-submit">保存</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- 删除确认弹窗 -->
+                    <div v-if="showDeleteModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                        <div style="background-color: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 400px;">
+                            <h3>确认删除</h3>
+                            <p>确定要删除这条记录吗？此操作不可撤销。</p>
+                            <div style="text-align: right; margin-top: 20px;">
+                                <button class="btn-cancel" @click="showDeleteModal = false">取消</button>
+                                <button class="btn-submit" style="background-color: #F56C6C;" @click="deleteRecord">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 服务器设置弹窗 -->
+        <div v-if="showServerSettings" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+            <div style="background-color: white; padding: 30px; border-radius: 5px; width: 90%; max-width: 500px;">
+                <h3>服务器设置</h3>
+                <form class="settings-form" @submit.prevent="saveServerSettings">
+                    <div class="form-item">
+                        <label for="serverUrl">服务器地址</label>
+                        <input type="text" id="serverUrl" v-model="serverSettings.url" placeholder="例如: http://127.0.0.1:5000" required>
+                    </div>
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button type="button" class="btn-cancel" @click="showServerSettings = false">取消</button>
+                        <button type="submit" class="btn-submit">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp } = Vue
+        
+        createApp({
+            data() {
+                return {
+                    // 登录状态
+                    isLoggedIn: false,
+                    loginForm: {
+                        username: '',
+                        password: ''
+                    },
+                    
+                    // 服务器设置
+                    showServerSettings: false,
+                    serverSettings: {
+                        url: localStorage.getItem('serverUrl') || 'http://192.168.5.67:5000'
+                    },
+                    
+                    // 应用状态
+                    activeTab: 'in',
+                    inForm: {
+                        weight: '',
+                        amount: ''
+                    },
+                    outForm: {
+                        weight: '',
+                        amount: ''
+                    },
+                    summary: {
+                        current_stock: 0,
+                        total_sales: 0,
+                        total_cost: 0,
+                        profit: 0
+                    },
+                    records: [],
+                    
+                    // 编辑和删除相关
+                    showEditModal: false,
+                    showDeleteModal: false,
+                    currentRecordId: null,
+                    editForm: {
+                        id: '',
+                        type: '',
+                        weight: '',
+                        amount: '',
+                        unit: ''
+                    },
+                    
+                    // 时间范围查询
+                    dateRange: {
+                        start: '',
+                        end: ''
+                    }
+                }
+            },
+            mounted() {
+                // 检查本地存储中的登录状态
+                this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
+                // 如果已登录，加载数据
+                if (this.isLoggedIn) {
+                    this.fetchSummary()
+                    this.fetchRecords()
+                }
+            },
+            methods: {
+                // 登录
+                async handleLogin() {
+                    try {
+                        // 这里简化处理，实际项目中应该调用后端登录接口
+                        // 暂时使用默认用户名密码
+                        if (this.loginForm.username === 'admin' && this.loginForm.password === '123456') {
+                            this.isLoggedIn = true
+                            localStorage.setItem('isLoggedIn', 'true')
+                            localStorage.setItem('username', this.loginForm.username)
+                            this.fetchSummary()
+                            this.fetchRecords()
+                        } else {
+                            alert('用户名或密码错误')
+                        }
+                    } catch (error) {
+                        alert('登录失败，请检查网络连接')
+                    }
+                },
+                
+                // 退出登录
+                handleLogout() {
+                    this.isLoggedIn = false
+                    localStorage.removeItem('isLoggedIn')
+                    localStorage.removeItem('username')
+                    this.loginForm = {
+                        username: '',
+                        password: ''
+                    }
+                },
+                
+                // 保存服务器设置
+                saveServerSettings() {
+                    localStorage.setItem('serverUrl', this.serverSettings.url)
+                    this.showServerSettings = false
+                    alert('服务器设置已保存')
+                    // 如果已登录，重新加载数据
+                    if (this.isLoggedIn) {
+                        this.fetchSummary()
+                        this.fetchRecords()
+                    }
+                },
+                
+                // 获取服务器地址
+                getServerUrl() {
+                    return localStorage.getItem('serverUrl') || 'http://192.168.5.67:5000'
+                },
+                
+                // 入库
+                async handleInSubmit() {
+                    try {
+                        const serverUrl = this.getServerUrl()
+                        const response = await fetch(`${serverUrl}/api/stock/in`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(this.inForm)
+                        })
+                        const data = await response.json()
+                        if (data.success) {
+                            alert('入库成功')
+                            this.inForm = { weight: '', amount: '' }
+                            this.fetchSummary()
+                            this.fetchRecords()
+                        } else {
+                            alert('入库失败: ' + data.error)
+                        }
+                    } catch (error) {
+                        alert('网络错误，请检查后端服务是否运行')
+                    }
+                },
+                
+                // 出库
+                async handleOutSubmit() {
+                    try {
+                        const serverUrl = this.getServerUrl()
+                        const response = await fetch(`${serverUrl}/api/stock/out`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(this.outForm)
+                        })
+                        const data = await response.json()
+                        if (data.success) {
+                            alert('出库成功')
+                            this.outForm = { weight: '', amount: '' }
+                            this.fetchSummary()
+                            this.fetchRecords()
+                        } else {
+                            alert('出库失败: ' + data.error)
+                        }
+                    } catch (error) {
+                        alert('网络错误，请检查后端服务是否运行')
+                    }
+                },
+                
+                // 获取库存信息
+                async fetchSummary() {
+                    try {
+                        const serverUrl = this.getServerUrl()
+                        const response = await fetch(`${serverUrl}/api/stock/summary`)
+                        const data = await response.json()
+                        this.summary = data
+                    } catch (error) {
+                        console.error('获取库存信息失败:', error)
+                    }
+                },
+                
+                // 获取出入库记录
+                async fetchRecords() {
+                    try {
+                        const serverUrl = this.getServerUrl()
+                        const response = await fetch(`${serverUrl}/api/stock/records`)
+                        const data = await response.json()
+                        this.records = data
+                    } catch (error) {
+                        console.error('获取记录失败:', error)
+                    }
+                },
+                
+                // 编辑记录
+                editRecord(record) {
+                    this.editForm = {
+                        id: record.id,
+                        type: record.type,
+                        weight: record.weight,
+                        amount: record.amount,
+                        unit: record.unit
+                    }
+                    this.showEditModal = true
+                },
+                
+                // 保存编辑
+                async saveEdit() {
+                    try {
+                        const serverUrl = this.getServerUrl()
+                        const response = await fetch(`${serverUrl}/api/stock/records/${this.editForm.id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                weight: this.editForm.weight,
+                                amount: this.editForm.amount
+                            })
+                        })
+                        const data = await response.json()
+                        if (data.success) {
+                            alert('记录更新成功')
+                            this.showEditModal = false
+                            this.fetchSummary()
+                            this.fetchRecords()
+                        } else {
+                            alert('更新失败: ' + data.error)
+                        }
+                    } catch (error) {
+                        alert('网络错误，请检查后端服务是否运行')
+                    }
+                },
+                
+                // 确认删除
+                confirmDelete(recordId) {
+                    this.currentRecordId = recordId
+                    this.showDeleteModal = true
+                },
+                
+                // 删除记录
+                async deleteRecord() {
+                    try {
+                        const serverUrl = this.getServerUrl()
+                        const response = await fetch(`${serverUrl}/api/stock/records/${this.currentRecordId}`, {
+                            method: 'DELETE'
+                        })
+                        const data = await response.json()
+                        if (data.success) {
+                            alert('记录删除成功')
+                            this.showDeleteModal = false
+                            this.fetchSummary()
+                            this.fetchRecords()
+                        } else {
+                            alert('删除失败: ' + data.error)
+                        }
+                    } catch (error) {
+                        alert('网络错误，请检查后端服务是否运行')
+                    }
+                },
+                
+                // 根据时间范围获取记录
+                async fetchRecordsByDateRange() {
+                    try {
+                        const serverUrl = this.getServerUrl()
+                        let url = `${serverUrl}/api/stock/records`
+                        
+                        // 构建查询参数
+                        const params = []
+                        if (this.dateRange.start) {
+                            params.push(`start_time=${this.dateRange.start}`)
+                        }
+                        if (this.dateRange.end) {
+                            params.push(`end_time=${this.dateRange.end}`)
+                        }
+                        
+                        if (params.length > 0) {
+                            url += `?${params.join('&')}`
+                        }
+                        
+                        const response = await fetch(url)
+                        const data = await response.json()
+                        this.records = data
+                    } catch (error) {
+                        console.error('获取记录失败:', error)
+                        alert('网络错误，请检查后端服务是否运行')
+                    }
+                },
+                
+                // 重置时间范围
+                resetDateRange() {
+                    this.dateRange = {
+                        start: '',
+                        end: ''
+                    }
+                    this.fetchRecords()
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
